@@ -44,8 +44,7 @@ ENV PYTHONPATH="${PYTHONPATH}:/workspace/CosyVoice:/workspace/CosyVoice/third_pa
 
 RUN git clone --recursive https://github.com/sendhello/CosyVoice-Worker.git
 
-RUN conda activate ${VENV} && conda install -y -c conda-forge pynini==2.1.5
-RUN conda activate ${VENV} && cd CosyVoice
+RUN conda activate ${VENV} && conda install -y -c conda-forge pynini==2.1.5 && cd CosyVoice
 RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --no-cache-dir
 
 RUN git submodule update --init --recursive

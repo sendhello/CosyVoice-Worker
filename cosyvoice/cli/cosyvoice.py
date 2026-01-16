@@ -22,6 +22,11 @@ from cosyvoice.cli.frontend import CosyVoiceFrontEnd
 from cosyvoice.cli.model import CosyVoiceModel, CosyVoice2Model, CosyVoice3Model
 from cosyvoice.utils.file_utils import logging
 from cosyvoice.utils.class_utils import get_model_type
+try:
+    import ruamel.yaml
+    from ruamel.yaml import loader as ruamel_loader
+except Exception:
+    ruamel = None
 
 
 class CosyVoice:
@@ -188,6 +193,22 @@ class CosyVoice2(CosyVoice):
                 start_time = time.time()
 
 
+def _ensure_ruamel_max_depth():
+    """
+    Совместимость ruamel.yaml с hyperpyyaml:
+    hyperpyyaml ожидает, что Loader имеет атрибут max_depth.
+    Если его нет — добавим.
+    """
+    try:
+        if ruamel_loader is None:
+            return
+        if not hasattr(ruamel_loader.Loader, "max_depth"):
+            ruamel_loader.Loader.max_depth = None
+    except Exception:
+        # если ruamel не доступен — просто пропускаем
+        return
+
+
 class CosyVoice3(CosyVoice2):
 
     def __init__(self, model_dir, load_trt=False, load_vllm=False, fp16=False, trt_concurrent=1):
@@ -198,6 +219,7 @@ class CosyVoice3(CosyVoice2):
         hyper_yaml_path = '{}/cosyvoice3.yaml'.format(model_dir)
         if not os.path.exists(hyper_yaml_path):
             raise ValueError('{} not found!'.format(hyper_yaml_path))
+        _ensure_ruamel_max_depth()
         with open(hyper_yaml_path, 'r') as f:
             configs = load_hyperpyyaml(f, overrides={'qwen_pretrain_path': os.path.join(model_dir, 'CosyVoice-BlankEN')})
         assert get_model_type(configs) == CosyVoice3Model, 'do not use {} for CosyVoice3 initialization!'.format(model_dir)

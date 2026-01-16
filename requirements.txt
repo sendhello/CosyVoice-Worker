@@ -40,3 +40,5 @@ x-transformers==2.11.24
 uvicorn==0.30.0
 wetext==0.0.4
 wget==3.2
+boto3==1.35.54
+pydantic-settings==2.6.1

@@ -99,13 +99,25 @@ def cosyvoice3_example():
     # 歴史的世界においては、過去は単に過ぎ去ったものではない、プラトンのいう如く非有が有である。 -> レキシ テキ セカイ ニ オイ テ ワ、カコ ワ タンニ スギサッ タ モノ デ ワ ナイ、プラトン ノ イウ ゴトク ヒ ユー ガ ユー デ アル。
     for i, j in enumerate(cosyvoice.inference_cross_lingual('You are a helpful assistant.<|endofprompt|>レキシ テキ セカイ ニ オイ テ ワ、カコ ワ タンニ スギサッ タ モノ デ ワ ナイ、プラトン ノ イウ ゴトク ヒ ユー ガ ユー デ アル。',
                                                             './asset/zero_shot_prompt.wav', stream=False)):
-        torchaudio.save('japanese_{}.wav'.format(i), j['tts_speech'], cosyvoice.sample_rate)    
+        torchaudio.save('japanese_{}.wav'.format(i), j['tts_speech'], cosyvoice.sample_rate)
+
+
+def cosyvoice3_my_example():
+    """ CosyVoice3 Usage, check https://funaudiollm.github.io/cosyvoice3/ for more details
+    """
+    cosyvoice = AutoModel(model_dir='pretrained_models/Fun-CosyVoice3-0.5B')
+    # zero_shot usage
+    for i, j in enumerate(cosyvoice.inference_zero_shot('A scalable multilingual zero-shot text-to-speech synthesizer based on supervised semantic tokens', 'You are a helpful assistant.<|endofprompt|>希望你以后能够做的比我还好呦。',
+                                                        './asset/zero_shot_prompt.wav', stream=False)):
+        torchaudio.save('zero_shot_{}.wav'.format(i), j['tts_speech'], cosyvoice.sample_rate)
+
 
 
 def main():
     # cosyvoice_example()
     # cosyvoice2_example()
-    cosyvoice3_example()
+    # cosyvoice3_example()
+    cosyvoice3_my_example()
 
 
 if __name__ == '__main__':

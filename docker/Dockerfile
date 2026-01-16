@@ -45,7 +45,24 @@ ENV PYTHONPATH="${PYTHONPATH}:/workspace/CosyVoice:/workspace/CosyVoice/third_pa
 RUN git clone --recursive https://github.com/sendhello/CosyVoice-Worker.git
 
 RUN conda activate ${VENV} && conda install -y -c conda-forge pynini==2.1.5
-RUN conda activate ${VENV} && cd CosyVoice && \
-    pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --no-cache-dir
+RUN conda activate ${VENV} && cd CosyVoice
+RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --no-cache-dir
+
+RUN git submodule update --init --recursive
+
+RUN python &&  \
+    from huggingface_hub import snapshot_download &&  \
+    snapshot_download('FunAudioLLM/Fun-CosyVoice3-0.5B-2512', local_dir='pretrained_models/Fun-CosyVoice3-0.5B') &&  \
+    snapshot_download('FunAudioLLM/CosyVoice-ttsfrd', local_dir='pretrained_models/CosyVoice-ttsfrd')
+
+RUN cd pretrained_models/CosyVoice-ttsfrd/ &&  \
+    unzip resource.zip -d . &&  \
+    pip install ttsfrd_dependency-0.1-py3-none-any.whl && \
+    pip install ttsfrd-0.4.2-cp310-cp310-linux_x86_64.whl &&  \
+    pip install
+
+RUN conda create -n cosyvoice_vllm --clone cosyvoice && \
+    conda activate cosyvoice_vllm && \
+    pip install vllm==v0.11.0 transformers==4.57.1 numpy==1.26.4 -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com && \
 
 WORKDIR /workspace/CosyVoice
